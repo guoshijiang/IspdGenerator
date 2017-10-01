@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <QObject>
 
-#define color_black_red "黑红"
-#define color_white_red "白红"
+#define color_black_red QObject::tr("黑红")
+#define color_white_red QObject::tr("白红")
 
-#define size_big    "大"
-#define size_middle "中"
-#define size_small  "小"
-
+#define size_big    QObject::tr("大")
+#define size_middle QObject::tr("中")
+#define size_small  QObject::tr("小")
 
 class common
 {

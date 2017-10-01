@@ -101,7 +101,6 @@ void ExcelBasePrivate::destory()
 #endif
 }
 
-
 ExcelBase::ExcelBase(QObject* par):QObject(par), d_ptr(new ExcelBasePrivate(this))
 {
 }
@@ -282,10 +281,10 @@ bool ExcelBase::addBook()
     Q_D(ExcelBase);
     if (d->excel != NULL && !d->excel->isNull())
     {
-        TC_FREE(d->sheet );
+        TC_FREE(d->sheet);
         TC_FREE(d->sheets);
-        TC_FREE(d->book  );
-        TC_FREE(d->books );
+        TC_FREE(d->book);
+        TC_FREE(d->books);
         d->books = d->excel->querySubObject("WorkBooks");
         ret = d->books != NULL && !d->books->isNull();
     }
@@ -553,7 +552,7 @@ void ExcelBase::castVariant2ListListVariant(const QVariant &var, QList<QList<QVa
     QVariantList varRows = var.toList();
     if(varRows.isEmpty())
     {
-        return;
+        return ;
     }
     const int rowCount = varRows.size();
     QVariantList rowData;
