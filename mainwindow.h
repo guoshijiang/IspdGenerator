@@ -33,18 +33,17 @@ private slots:
     void on_action_open_triggered();
     void on_action_create_triggered();
     void on_pushButton_reset_clicked();
-    void on_pushButton_execl_head_clicked();
+    //void on_pushButton_execl_head_clicked();
     void on_textEdit_textChanged();
     void on_pushButton_select_clicked();
     //void on_pushButton_newfile_clicked();
 
     void on_pushButton_close_clicked();
 
-    void on_dateEdit_editingFinished();
 
-    void on_dateEdit_dateTimeChanged(const QDateTime &dateTime);
 
-    void on_dateEdit_dateChanged(const QDate &date);
+
+    void on_pushButton_execl_head_clicked();
 
 public slots:
     void recvMsg(QString msg);

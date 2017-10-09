@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QTextCursor>
 #include <QMessageBox>
+#include <QDir>
 
 #define MESSAGE_RED "<font size = 200 color = red ><strong>"
 #define MESSAGE_GREEN "<font size = 200 color = blue ><strong>"
@@ -19,7 +20,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    QSettings settings("D:/guosjQt/IspdGenerator/etc/config.ini", QSettings::IniFormat);
+    QDir dir;
+    QString program_path = dir.currentPath();
+    QString path = program_path + "/config.ini";
+    qDebug() << "path = " << path;
+    QSettings settings(path, QSettings::IniFormat);
     this->m_product_type = settings.value("product_type").toString();
     this->m_product_size = settings.value("product_size").toString();
     this->m_product_color = settings.value("product_color").toString();
@@ -95,10 +100,10 @@ void MainWindow::main_window_init()
    */
     this->ui->dateEdit->setDateTime(QDateTime::currentDateTime());
     this->ui->pushButton_select->setDisabled(true);
-    this->ui->pushButton_execl_head->setDisabled(true);
     this->ui->pushButton_reset->setDisabled(true);
     this->ui->pushButton_write->setDisabled(true);
     this->ui->pushButton_close->setDisabled(true);
+    this->ui->pushButton_execl_head->setDisabled(true);
 }
 
 void MainWindow::start()
@@ -107,7 +112,7 @@ void MainWindow::start()
     //this->setMouseTracking(false);
     //this->setFixedSize(1130, 1020);
     //this->setWindowFlags(windowFlags()|Qt::WindowMinimizeButtonHint|Qt::WindowStaysOnTopHint);
-    this->showNormal(); 
+    this->showMaximized();
 
     main_window_init();
     connect(this, SIGNAL(sendMsg(QString)), this, SLOT(recvMsg(QString)));
@@ -126,7 +131,7 @@ void MainWindow::on_action_open_triggered()
     }
     this->m_execlfile_name = xls_file_name;
     m_xls->open(this->m_execlfile_name);
-    QString sentence_log = tr("打开文件成功:");
+    QString sentence_log = QString::fromLocal8Bit("打开文件成功:");
     this->m_log_str = sentence_log + this->m_execlfile_name;
     ui->textEdit_optlog->append(m_log_str);
     ui->pushButton_select->setEnabled(true);
@@ -144,14 +149,14 @@ void MainWindow::on_action_create_triggered()
     dialog.setNameFilter("execl file(*.xls *.xlsx)");
     if(QDialog::Accepted == dialog.exec())
     {
-        QString sentence_log = tr("通过对话框的形式创建文档成功:");
+        QString sentence_log = QString::fromLocal8Bit("创建文档成功:");
         QString new_file_name = dialog.selectedFiles()[0];
         if(m_xls.isNull())
         {
             m_xls.reset(new ExcelBase);
         }
         m_xls->create(new_file_name);
-        m_xls->save();
+         m_xls->save();
         this->m_log_str = sentence_log + new_file_name;
         ui->textEdit_optlog->append(this->m_log_str);
     }
@@ -186,9 +191,9 @@ void MainWindow::on_pushButton_write_clicked()
     QString       encrypt_str;
     if(this->ui->lineEdit_startid->text() == NULL || this->ui->lineEdit_need_num->text() == NULL)
     {
-        this->m_err_info = tr("起始ID或者录入的需求个数为空,请您必须输入!");
+        this->m_err_info = QString::fromLocal8Bit("起始ID或者录入的需求个数为空,请您必须输入!");
         QString err_info = MESSAGE_RED + m_err_info + MESSAGE_END;
-        QMessageBox::warning(this, tr("警告"), err_info);
+        QMessageBox::warning(this, QString::fromLocal8Bit("警告"), err_info);
         qCritical() << m_err_info;
         this->ui->textEdit_optlog->append(m_err_info);
         return ;
@@ -223,12 +228,10 @@ void MainWindow::on_pushButton_write_clicked()
     m_xls->setCurrentSheet(this->m_execl_sheet);
     QString ispd_color = ui->comboBox_color->currentText().trimmed();
     QString ispd_size = ui->comboBox_size->currentText().trimmed();
-    qDebug() << "ispd_color = " << ispd_color;
-    qDebug() << "ispd_size = "  << ispd_size;
     for(int i = this->m_start_id; i < (this->m_start_id + this->m_ispd_num); i++)
     {
 
-        QString sentence_log = tr("数据写入Eexecl文件成功:");
+        QString sentence_log = QString::fromLocal8Bit("数据写入Eexecl文件成功:");
         QDateTime time = QDateTime::currentDateTime();
         QString time_str = time.toString("yyyy-MM-dd hh:mm:ss");
         QString ispd_str = QString::number(i);
@@ -262,7 +265,7 @@ void MainWindow::on_pushButton_write_clicked()
     }
     this->ui->uploadProgressBar->setValue(100);
     m_xls->save();
-    ui->label_status_result->setText(tr("写入Execl文件成功"));
+    ui->label_status_result->setText(QString::fromLocal8Bit("写入Execl文件成功"));
     ui->pushButton_write->setDisabled(true);
     ui->pushButton_close->setEnabled(true);
     ui->pushButton_reset->setDisabled(false);
@@ -284,34 +287,11 @@ void MainWindow::on_pushButton_reset_clicked()
     ui->lineEdit_cap->clear();
     ui->pushButton_reset->setEnabled(false);
     ui->textEdit_optlog->clear();
-    ui->label_status_result->setText(tr("重置成功"));
+    ui->label_status_result->setText(QString::fromLocal8Bit("重置成功"));
     ui->pushButton_write->setEnabled(true);
 }
 
-void MainWindow::on_pushButton_execl_head_clicked()
-{
-    m_xls->setCurrentSheet(this->m_execl_sheet);
-    m_xls->write(1, 1, "超级版原始ID");
-    m_xls->write(1, 2, "超级版加密ID");
-    m_xls->write(1, 3, "产品型号");
-    m_xls->write(1, 4, "产品颜色");
-    m_xls->write(1, 5, "电池类型");
-    m_xls->write(1, 6, "防水等级");
-    m_xls->write(1, 7, "输入电压");
-    m_xls->write(1, 8, "输入电流");
-    m_xls->write(1, 9, "电池容量");
-    m_xls->write(1, 10, "序列号");
-    m_xls->write(1, 11, "日期时间");
-    m_xls->save();
-    QString sentence_log = tr("设置execl的头部成功:设置项包括->超级版原始ID->超级版加密ID->产品型号"
-                              "->产品颜色->电池类型->防水等级->输入电压->输入电流->电池容量->"
-                              "序列号->日期时间");
-    this->m_log_str  = sentence_log;
-    ui->textEdit_optlog->append(m_log_str);
-    ui->label_status_result->setText(tr("设置execl头成功"));
-    ui->pushButton_write->setEnabled(true);
-    ui->pushButton_execl_head->setDisabled(true);
-}
+
 
 void MainWindow::on_textEdit_textChanged()
 {
@@ -323,15 +303,15 @@ void MainWindow::on_textEdit_textChanged()
 void MainWindow::on_pushButton_select_clicked()
 {
     this->m_execl_sheet = ui->lineEdit_sheets->text().toInt();
-    QString sentence_log = tr("选择工作sheet成功:");
+    QString sentence_log = QString::fromLocal8Bit("选择工作sheet成功:");
     this->m_log_str = sentence_log + QString::number(this->m_execl_sheet);
     ui->textEdit_optlog->append(m_log_str);
-    ui->pushButton_execl_head->setEnabled(true);
+    this->ui->pushButton_execl_head->setEnabled(true);
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-   this->m_log_str = tr("关闭Execl成功");
+   this->m_log_str = QString::fromLocal8Bit("关闭Execl成功");
    m_xls->close();
    ui->textEdit_optlog->append(this->m_log_str);
 }
@@ -357,30 +337,38 @@ void MainWindow::on_pushButton_newfile_clicked()
 
 void MainWindow::on_pushButton_close_clicked()
 {
-    QString sentence_log = tr("关闭Execl成功:");
+    QString sentence_log = QString::fromLocal8Bit("关闭Execl成功:");
     if(!m_xls.isNull())
     {
         m_xls->close();
         this->m_log_str = sentence_log + this->m_execlfile_name;
         ui->textEdit_optlog->append(this->m_log_str);
     }
-    this->ui->pushButton_execl_head->setDisabled(true);
     this->ui->pushButton_reset->setDisabled(true);
     this->ui->pushButton_select->setDisabled(true);
     this->ui->pushButton_write->setDisabled(true);
 }
 
-void MainWindow::on_dateEdit_editingFinished()
+void MainWindow::on_pushButton_execl_head_clicked()
 {
-
-}
-
-void MainWindow::on_dateEdit_dateTimeChanged(const QDateTime &dateTime)
-{
-
-}
-
-void MainWindow::on_dateEdit_dateChanged(const QDate &date)
-{
-
+    m_xls->setCurrentSheet(this->m_execl_sheet);
+    m_xls->write(1, 1, QString::fromLocal8Bit("超级版原始ID"));
+    m_xls->write(1, 2, QString::fromLocal8Bit("超级版加密ID"));
+    m_xls->write(1, 3, QString::fromLocal8Bit("产品型号"));
+    m_xls->write(1, 4, QString::fromLocal8Bit("产品颜色"));
+    m_xls->write(1, 5, QString::fromLocal8Bit("电池类型"));
+    m_xls->write(1, 6, QString::fromLocal8Bit("防水等级"));
+    m_xls->write(1, 7, QString::fromLocal8Bit("输入电压"));
+    m_xls->write(1, 8, QString::fromLocal8Bit("输入电流"));
+    m_xls->write(1, 9, QString::fromLocal8Bit("电池容量"));
+    m_xls->write(1, 10, QString::fromLocal8Bit("序列号"));
+    m_xls->write(1, 11, QString::fromLocal8Bit("日期时间"));
+    m_xls->save();
+    QString sentence_log = QString::fromLocal8Bit("设置execl的头部成功:设置项包括->超级版原始ID->超级版加密ID->产品型号"
+                              "->产品颜色->电池类型->防水等级->输入电压->输入电流->电池容量->"
+                              "序列号->日期时间");
+    this->m_log_str  = sentence_log;
+    ui->textEdit_optlog->append(m_log_str);
+    ui->label_status_result->setText(QString::fromLocal8Bit("设置execl头成功"));
+    ui->pushButton_write->setEnabled(true);
 }
