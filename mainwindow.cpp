@@ -103,10 +103,10 @@ void MainWindow::main_window_init()
 
 void MainWindow::start()
 {
-    this->setAutoFillBackground(true);
-    this->setMouseTracking(false);
-    this->setFixedSize(1130, 1020);
-    this->setWindowFlags(windowFlags()|Qt::WindowMinimizeButtonHint|Qt::WindowStaysOnTopHint);
+    //this->setAutoFillBackground(true);
+    //this->setMouseTracking(false);
+    //this->setFixedSize(1130, 1020);
+    //this->setWindowFlags(windowFlags()|Qt::WindowMinimizeButtonHint|Qt::WindowStaysOnTopHint);
     this->showNormal(); 
 
     main_window_init();
